@@ -109,7 +109,11 @@ MainMenu:
 
 EatMe:
 	Cls()
-	
+	mode = 1
+	dirname := "C:\Users\ZackerySimino\OneDrive - LightRiver Technologies Inc\Documents\GitHub\Pokedex\Snorlax\Backpack\EatMe"
+
+	filename, err := ReadDir
+
 
 
 }
