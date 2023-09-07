@@ -1,4 +1,4 @@
-package sleeptalk
+package SleepTalk
 
 import (
 	"fmt"
