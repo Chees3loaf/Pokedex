@@ -8,7 +8,7 @@ import (
 	"bufio"
 	"os"
 	"os/exec"
-	"Snorlax\moves\sleeptalk.go"
+	"Pokedex/Snorlax/moves/sleeptalk.go"
 	
 )
 
@@ -111,7 +111,7 @@ MainMenu:
 EatMe:
 	Cls()
 	mode = 1
-	files, err := SleepTalk.Map("Snorlax\Backpack\EatMe")
+	files, err := SleepTalk.Map("Pokedex/Snorlax/Backpack/EatMe")
 	if err != nil {
     	fmt.Println("Error:", err)
 	} else {
@@ -126,7 +126,7 @@ EatMe:
 DrinkMe:
 	Cls()
 	mode = 2
-	files, err := SleepTalk.map("Snorlax\Backpack\DrinkMe")
+	files, err := SleepTalk.Map("Pokedex/Snorlax/Backpack/DrinkMe")
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
