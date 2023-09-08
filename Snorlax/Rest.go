@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"os"
 	"os/exec"
+	"Snorlax\moves\sleeptalk.go"
 	
 )
 
@@ -110,10 +111,35 @@ MainMenu:
 EatMe:
 	Cls()
 	mode = 1
-	dirname := "C:\Users\ZackerySimino\OneDrive - LightRiver Technologies Inc\Documents\GitHub\Pokedex\Snorlax\Backpack\EatMe"
+	files, err := SleepTalk.Map("Snorlax\Backpack\EatMe")
+	if err != nil {
+    	fmt.Println("Error:", err)
+	} else {
+    	fmt.Println("The Finest of Tavern Foods")
+    	for _, filename := range files {
+        	fmt.Println(filename)
+    	}
+	}
 
-	filename, err := ReadDir
 
 
+DrinkMe:
+	Cls()
+	mode = 2
+	files, err := SleepTalk.map("Snorlax\Backpack\DrinkMe")
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("A Very Marry Un-Birthday to You!")
+		fmt.Println("    The Tea Party Awaits")
+		for _, filename := range files {
+			fmt.Println(filename)
+		}
+	}
 
+
+	
+
+Exit:
+	os.Exit(0)
 }
