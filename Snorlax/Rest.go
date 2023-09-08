@@ -8,7 +8,7 @@ import (
 	"bufio"
 	"os"
 	"os/exec"
-	"Pokedex/Snorlax/moves/sleeptalk.go"
+	"github.com/Chees3loaf/Pokedex/Snorlax/moves"
 	
 )
 
@@ -43,7 +43,7 @@ func wait(seconds int) {
 	}()
 
 	<-done
-	fmt.Printf("Waited for %d seconds./n,", seconds)
+	//fmt.Printf("Waited for %d seconds./n,", seconds)
 
 }
 //Clears screen in cmd
@@ -70,11 +70,10 @@ func StringPrompt(label string) string {
 }
 
 func main() {
-	mode := 0 // 0: unset, 1: Eat Me, 2: Drink Me, 3: Wake Up
 	var err error
-	var resp []byte
-	var interfaces, interfaceList []string
-	var adapterNum uint32 = 0
+	var files []string
+	//var interfaces, interfaceList []string
+	//var adapterNum uint32 = 0
 
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
@@ -85,33 +84,29 @@ func main() {
 
 
 MainMenu:
-	mode = 0
 	fmt.Println("Choose One")
 	fmt.Println("1. Eat Me")
 	fmt.Println("2. Drink Me")
 	fmt.Println("3. Wake Up")
 	res := StringPrompt("One or Two, What shall I do?")
 	if res == "1" {
-		mode = 1
 		goto EatMe
 	} else if res == "2" {
-		mode = 2
 		goto DrinkMe
 	} else if res == "3" {
 		Cls()
 		fmt.Println("Goodbye Friend!")
-		time.Sleep(3 * time.seconds)
+		time.Sleep(3 * time.Second)
 		goto Exit
 	} else {
 		fmt.Println("1, 2 or 3, it's all the same to me...")
-		time.Sleep(3 * time.seconds)
+		time.Sleep(3 * time.Second)
 		goto MainMenu
 	}
 
 EatMe:
 	Cls()
-	mode = 1
-	files, err := SleepTalk.Map("Pokedex/Snorlax/Backpack/EatMe")
+		files, err = SleepTalk.Map("github.com/Chees3loaf/Pokedex/Snorlax/Backpack/EatMe")
 	if err != nil {
     	fmt.Println("Error:", err)
 	} else {
@@ -125,8 +120,7 @@ EatMe:
 
 DrinkMe:
 	Cls()
-	mode = 2
-	files, err := SleepTalk.Map("Pokedex/Snorlax/Backpack/DrinkMe")
+		files, err = SleepTalk.Map("github.com/Chees3loaf/Pokedex/Snorlax/Backpack/DrinkMe")
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
