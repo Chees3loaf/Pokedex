@@ -13,45 +13,6 @@ import(
 
 func Psychic() {
 	
-	for {
-		cls()
-		fmt.Println("Choose One")
-		fmt.Println("1. Eat Me")
-		fmt.Println("2. Drink Me")
-		fmt.Println("3. Wake Up")
-		res := stringPrompt("One or Two, What shall I do?")
-
-		switch res {
-		case "1":
-			response := fetchFromServer("/eatme")
-			fmt.Println(response)
-			listAndSelectFiles("./EatMe")
-		case "2":
-			response := fetchFromServer("/drinkme")
-			fmt.Println(response)
-			listAndSelectFiles("./DrinkMe")
-		case "3":
-			for {
-				cls()
-				fmt.Println("Are You Sure?")
-				fmt.Println("1. No or 2. Yes")
-				resCheck := stringPrompt("Choose Wisely")
-				if resCheck == "1" {
-					break
-				} else if resCheck == "2" {
-					fmt.Println("Goodbye Friend!")
-					os.Exit(0)
-				} else {
-					fmt.Println("Please choose 1 or 2.")
-					time.Sleep(2 * time.Second)
-				}
-			}
-		default:
-			fmt.Println("1, 2 or 3, it's all the same to me...")
-			time.Sleep(3 * time.Second)
-		}
-	}
-
 	func wait(seconds int) {
 		done := make(chan struct{})
 	
@@ -114,8 +75,9 @@ func listAndSelectFiles(directory string) {
 			fmt.Println(content)
 		}
 	
-		printOption := stringPrompt("Save for the network apocalypse? (Yes/No)")
+		printOption := stringPrompt("Save for the coming network apocalypse? (Yes/No)")
 		if printOption == "Yes" {
+			fmt.Println("Good choice")
 			err = Cyberball.GeneratePDF(files[index-1], content)
 			if err != nil {
 				fmt.Println("Error generating PDF:", err)
@@ -128,8 +90,8 @@ func listAndSelectFiles(directory string) {
 	}
 	
 func fetchFromServer(endpoint string) string {
-	// Replace with your server's actual address and port
-	serverAddress := "http://your-server-address:your-port"
+
+	serverAddress := "10.0.0.55:55555"
 	
 		resp, err := http.Get(serverAddress + endpoint)
 		if err != nil {
