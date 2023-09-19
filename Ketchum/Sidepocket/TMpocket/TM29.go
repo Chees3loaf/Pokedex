@@ -13,7 +13,7 @@ import(
 
 func Psychic() {
 	
-	func wait(seconds int) {
+	func Wait(seconds int) {
 		done := make(chan struct{})
 	
 		go func() {
@@ -27,7 +27,7 @@ func Psychic() {
 	}
 	
 // Clears screen in cmd
-func cls() {
+func Cls() {
 	
 	cmd := exec.Command("cmd", "/c", "cls")
 	cmd.Stdout = os.Stdout
@@ -35,7 +35,7 @@ func cls() {
 	
 }
 	
-func stringPrompt(label string) string {
+func StringPrompt(label string) string {
 	var s string
 	r := bufio.NewReader(os.Stdin)
 	for {
@@ -49,7 +49,7 @@ func stringPrompt(label string) string {
 	
 }
 	
-func listAndSelectFiles(directory string) {
+func ListAndSelectFiles(directory string) {
 	files, err := Potion.Map(directory)
 	if err != nil {
 		fmt.Println("Error listing files:", err)
@@ -61,7 +61,7 @@ func listAndSelectFiles(directory string) {
 		fmt.Printf("%d. %s\n", i+1, file)
 	}
 	
-	choice := stringPrompt("Select a file by number to read its content:")
+	choice := StringPrompt("Select a file by number to read its content:")
 	index, err := strconv.Atoi(choice)
 	if err != nil || index < 1 || index > len(files) {
 		fmt.Println("Invalid selection.")
@@ -75,7 +75,7 @@ func listAndSelectFiles(directory string) {
 			fmt.Println(content)
 		}
 	
-		printOption := stringPrompt("Save for the coming network apocalypse? (Yes/No)")
+		printOption := StringPrompt("Save for the coming network apocalypse? (Yes/No)")
 		if printOption == "Yes" {
 			fmt.Println("Good choice")
 			err = Cyberball.GeneratePDF(files[index-1], content)
@@ -89,7 +89,7 @@ func listAndSelectFiles(directory string) {
 		}
 	}
 	
-func fetchFromServer(endpoint string) string {
+func FetchFromServer(endpoint string) string {
 
 	serverAddress := "10.0.0.55:55555"
 	
