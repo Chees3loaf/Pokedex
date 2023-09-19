@@ -2,5 +2,10 @@ go 1.21.1
 
 use (
 	./Ketchum
+	./Ketchum/Backpack
+	./Ketchum/Sidepocket
+	./Ketchum/Sidepocket/Ballpocket
+	./Ketchum/Sidepocket/HMpocket
+	./Ketchum/Sidepocket/TMpocket
 	./Snorlax
 )

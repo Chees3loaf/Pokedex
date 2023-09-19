@@ -9,8 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	Potion "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket"
-	Cyberball "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket/Ballpocket"
 	TM29 "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket/TMpocket"
 )
 
