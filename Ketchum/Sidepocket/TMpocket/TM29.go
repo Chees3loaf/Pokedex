@@ -1,118 +1,178 @@
 package TM29
 
-import(
+import (
 	"bufio"
+	"fmt"
 	"io"
+	"net"
+	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	Potion "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket"
 	Cyberball "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket/Ballpocket"
 )
 
-func Psychic() {
-	
-	func Wait(seconds int) {
-		done := make(chan struct{})
-	
-		go func() {
-			time.Sleep(time.Duration(seconds) * time.Second)
-			close(done)
-		}()
-	
-		<-done
-		//fmt.Printf("Waited for %d seconds./n,", seconds)
-	
-	}
-	
+var (
+	openConnections []*net.Conn
+	openFiles		[]*os.File
+	mutex 			sync.Mutex
+)
+
+func RegisterConnection(conn *net.Conn) {
+    mutex.Lock()
+    defer mutex.Unlock()
+    openConnections = append(openConnections, conn)
+}
+
+func RegisterFile(file *os.File) {
+    mutex.Lock()
+    defer mutex.Unlock()
+    openFiles = append(openFiles, file)
+}
+
+func CloseResources() {
+    mutex.Lock()
+    defer mutex.Unlock()
+
+    for _, conn := range openConnections {
+        if conn != nil {
+            if err := (*conn).Close(); err != nil {
+                fmt.Printf("Error closing connection: %v\n", err)
+            }
+        }
+    }
+    openConnections = []*net.Conn{}
+
+    for _, file := range openFiles {
+        if file != nil {
+            if err := file.Close(); err != nil {
+                fmt.Printf("Error closing file: %v\n", err)
+            }
+        }
+    }
+    openFiles = []*os.File{}
+
+    fmt.Println("All resources have been closed.")
+}
+
+func PrepareForShutdown() {
+    fmt.Println("Preparing for shutdown...")
+    CloseResources()
+    // Additional shutdown preparation tasks can be added here.
+}
+
+func Wait(seconds int) {
+	done := make(chan struct{})
+
+	go func() {
+		time.Sleep(time.Duration(seconds) * time.Second)
+		close(done)
+	}()
+
+	<-done
+	fmt.Printf("Waited for %d seconds./n,", seconds)
+
+}
+
 // Clears screen in cmd
 func Cls() {
-	
+
 	cmd := exec.Command("cmd", "/c", "cls")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
-	
+
 }
-	
-func StringPrompt(label string) string {
+
+func StringPrompt(label string) (string, error) {
 	var s string
 	r := bufio.NewReader(os.Stdin)
-	for {
-		fmt.Fprint(os.Stderr, label+" ")
-		s, _ = r.ReadString('\n')
-		if s != " " {
-			break
-		}
+
+	fmt.Fprint(os.Stderr, label+" ")
+	s, err := r.ReadString('\n')
+	if err != nil {
+		return "", err // Return an empty string and the error if one occurs
 	}
-	return strings.TrimSpace(s)
 	
+	return strings.TrimSpace(s), nil // Return the trimmed string and no error
 }
-	
+
+
 func ListAndSelectFiles(directory string) {
 	files, err := Potion.Map(directory)
 	if err != nil {
 		fmt.Println("Error listing files:", err)
 		return
 	}
-	
+
 	fmt.Println("Files available:")
 	for i, file := range files {
 		fmt.Printf("%d. %s\n", i+1, file)
 	}
-	
-	choice := StringPrompt("Select a file by number to read its content:")
+
+	choice, err := StringPrompt("Select a file by number to read its content:")
+	if err != nil {
+        fmt.Println("Error reading input:", err)
+        return
+    }
+
 	index, err := strconv.Atoi(choice)
 	if err != nil || index < 1 || index > len(files) {
 		fmt.Println("Invalid selection.")
 		return
 	}
-	
-	content, err := Potion.Load(directory + "/" + files[index-1])
-		if err != nil {
-			fmt.Println("Error reading file:", err)
-		} else {
-			fmt.Println(content)
-		}
-	
-		printOption := StringPrompt("Save for the coming network apocalypse? (Yes/No)")
-		if printOption == "Yes" {
-			fmt.Println("Good choice")
-			err = Cyberball.GeneratePDF(files[index-1], content)
-			if err != nil {
-				fmt.Println("Error generating PDF:", err)
-			} else {
-				fmt.Println("Keep it secret, keep it safe.", files[index-1]+".pdf")
-			}
-		} else if printOption == "No" {
-			fmt.Println("Suit yourself")
-		}
-	}
-	
-func FetchFromServer(endpoint string) string {
 
-	serverAddress := "10.0.0.55:55555"
-	
-		resp, err := http.Get(serverAddress + endpoint)
-		if err != nil {
-			fmt.Println("Error making request:", err)
-			return ""
-		}
-		defer resp.Body.Close()
-	
-		if resp.StatusCode != http.StatusOK {
-			fmt.Println("Server returned an error:", resp.Status)
-			return ""
-		}
-	
-		reader := bufio.NewReader(resp.Body)
-		content, err := reader.ReadString('\x00') // Read until a null character (which won't be found, so it reads the entire content)
-		if err != nil && err != io.EOF {
-			fmt.Println("Error reading response:", err)
-			return ""
-		}
-	
-		return content
+	content, err := Potion.Load(directory + "/" + files[index-1])
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+	} else {
+		fmt.Println(content)
 	}
-	
+
+	printOption, err := StringPrompt("Save for the coming network apocalypse? (Yes/No)")
+	if printOption == "Yes" {
+		fmt.Println("Good choice")
+		err = Cyberball.GeneratePDF(files[index-1], content)
+		if err != nil {
+			fmt.Println("Error generating PDF:", err)
+		} else {
+			fmt.Println("Keep it secret, keep it safe.", files[index-1]+".pdf")
+		}
+	} else if printOption == "No" {
+		fmt.Println("Suit yourself")
+	}
+}
+
+func FetchFromServer(endpoint string) (string, error) {
+    serverAddress := "10.0.0.55:55555"
+
+    resp, err := http.Get(serverAddress + endpoint)
+    if err != nil {
+        return "", fmt.Errorf("error making request to server: %v", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("server returned non-OK status: %s", resp.Status)
+    }
+
+    // Using bufio.Reader to read the response body
+    reader := bufio.NewReader(resp.Body)
+    var response strings.Builder
+    for {
+        line, err := reader.ReadString('\n')
+        if err != nil && err != io.EOF {
+            return "", fmt.Errorf("error reading response body: %v", err)
+        }
+        if err == io.EOF {
+            break
+        }
+        response.WriteString(line)
+    }
+
+    return response.String(), nil
 }

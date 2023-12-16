@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"time"
-	"os"
-	
-	
+	"context"
+    "fmt"
+    "net/http"
+    "os"
+    "os/signal"
+    "syscall"
+    "time"
+
+    TM29 "github.com/Chees3loaf/Pokedex/Ketchum/Sidepocket/TMpocket"
+
 )
 
 	func hello(w http.ResponseWriter, req *http.Request) {
@@ -60,14 +64,42 @@ func drinkMeHandler(w http.ResponseWriter, req *http.Request) {
 
 
 func main() {
-	
+    // Setup a channel to listen for interrupt signals
+    stop := make(chan os.Signal, 1)
+    signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/headers", headers)
-	http.HandleFunc("/eatme", eatMeHandler)
-	http.HandleFunc("/drinkme", drinkMeHandler)
+    // Define HTTP server
+    server := &http.Server{Addr: ":8090"}
 
-	http.ListenAndServe(":8090", nil)
+    // Setup request handlers
+    http.HandleFunc("/hello", hello)
+    http.HandleFunc("/headers", headers)
+    http.HandleFunc("/eatme", eatMeHandler)
+    http.HandleFunc("/drinkme", drinkMeHandler)
 
+    // Start the server in a separate goroutine
+    go func() {
+        fmt.Println("Starting server on port 8090")
+        if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+            fmt.Printf("listen: %s\n", err)
+        }
+    }()
 
+    // Wait for interrupt signal
+    <-stop
+    fmt.Println("Shutting down server...")
+
+    // Initiate graceful shutdown from TM29
+    TM29.PrepareForShutdown()
+
+    // Create a deadline for the shutdown process
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    // Shutdown the server
+    if err := server.Shutdown(ctx); err != nil {
+        fmt.Printf("Server shutdown error: %v\n", err)
+    }
+
+    fmt.Println("Server shut down gracefully")
 }

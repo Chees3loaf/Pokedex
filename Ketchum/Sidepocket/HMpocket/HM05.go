@@ -36,7 +36,7 @@ func Flash() {
 				continue
 			}
 			fmt.Println(response)
-			_, err = TM29.ListAndSelectFiles("./EatMe")
+			err = TM29.ListAndSelectFiles("./EatMe")
 			if err != nil {
 				fmt.Println("Error selecting file:", err)
 			}
@@ -47,7 +47,7 @@ func Flash() {
 				continue
 			}
 			fmt.Println(response)
-			_, err = TM29.ListAndSelectFiles("./DrinkMe")
+			err = TM29.ListAndSelectFiles("./DrinkMe")
 			if err != nil {
 				fmt.Println("Error selecting file:", err)
 			}

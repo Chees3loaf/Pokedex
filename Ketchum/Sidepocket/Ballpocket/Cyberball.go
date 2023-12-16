@@ -1,9 +1,6 @@
 package Cyberball
 
-import (
-	
-    "github.com/jung-kurt/gofpdf"
-)
+import "github.com/jung-kurt/gofpdf"
 
 func GeneratePDF(filename, content string) error {
     pdf := gofpdf.New("P", "mm", "A4", "")
