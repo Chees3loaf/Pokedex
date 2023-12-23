@@ -23,6 +23,7 @@ import (
 	fmt.Fprintln(w, "    ~_/      )")
 	fmt.Fprintln(w, "    (_(_/-(_/ ")
 	fmt.Fprintln(w, "It's", t.Format(time.Stamp))
+    
 }
 
 	func headers(w http.ResponseWriter, req *http.Request) {
@@ -85,6 +86,9 @@ func main() {
         }
     }()
 
+    //Starts main menu
+    go Flash()
+
     // Wait for interrupt signal
     <-stop
     fmt.Println("Shutting down server...")
@@ -102,4 +106,8 @@ func main() {
     }
 
     fmt.Println("Server shut down gracefully")
+}
+
+func Flash() {
+	panic("unimplemented")
 }

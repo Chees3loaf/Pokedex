@@ -102,50 +102,57 @@ func StringPrompt(label string) (string, error) {
 }
 
 
-func ListAndSelectFiles(directory string) {
-	files, err := Potion.Map(directory)
-	if err != nil {
-		fmt.Println("Error listing files:", err)
-		return
-	}
-
-	fmt.Println("Files available:")
-	for i, file := range files {
-		fmt.Printf("%d. %s\n", i+1, file)
-	}
-
-	choice, err := StringPrompt("Select a file by number to read its content:")
-	if err != nil {
-        fmt.Println("Error reading input:", err)
-        return
+func ListAndSelectFiles(directory string) (string, error) {
+    files, err := Potion.Map(directory)
+    if err != nil {
+        fmt.Println("Error listing files:", err)
+        return "", err
     }
 
-	index, err := strconv.Atoi(choice)
-	if err != nil || index < 1 || index > len(files) {
-		fmt.Println("Invalid selection.")
-		return
-	}
+    fmt.Println("Files available:")
+    for i, file := range files {
+        fmt.Printf("%d. %s\n", i+1, file)
+    }
 
-	content, err := Potion.Load(directory + "/" + files[index-1])
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-	} else {
-		fmt.Println(content)
-	}
+    choice, err := StringPrompt("Select a file by number to read its content:")
+    if err != nil {
+        fmt.Println("Error reading input:", err)
+        return "", err
+    }
 
-	printOption, err := StringPrompt("Save for the coming network apocalypse? (Yes/No)")
-	if printOption == "Yes" {
-		fmt.Println("Good choice")
-		err = Cyberball.GeneratePDF(files[index-1], content)
-		if err != nil {
-			fmt.Println("Error generating PDF:", err)
-		} else {
-			fmt.Println("Keep it secret, keep it safe.", files[index-1]+".pdf")
-		}
-	} else if printOption == "No" {
-		fmt.Println("Suit yourself")
-	}
+    index, err := strconv.Atoi(choice)
+    if err != nil || index < 1 || index > len(files) {
+        fmt.Println("Invalid selection.")
+        return "", fmt.Errorf("invalid selection")
+    }
+
+    selectedFileName := files[index-1] // Assuming this is the name of the file
+
+    content, err := Potion.Load(directory + "/" + selectedFileName)
+    if err != nil {
+        fmt.Println("Error reading file:", err)
+        return "", err
+    } else {
+        fmt.Println(content)
+    }
+
+    printOption, err := StringPrompt("Save for the coming network apocalypse? (Yes/No)")
+    if printOption == "Yes" {
+        fmt.Println("Good choice")
+        err = Cyberball.GeneratePDF(selectedFileName, content)
+        if err != nil {
+            fmt.Println("Error generating PDF:", err)
+            return "", err
+        } else {
+            fmt.Println("Keep it secret, keep it safe.", selectedFileName+".pdf")
+        }
+    } else if printOption == "No" {
+        fmt.Println("Suit yourself")
+    }
+
+    return selectedFileName, nil
 }
+
 
 func FetchFromServer(endpoint string) (string, error) {
     serverAddress := "10.0.0.55:55555"

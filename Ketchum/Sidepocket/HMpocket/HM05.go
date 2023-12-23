@@ -16,42 +16,46 @@ import (
 )
 
 func Flash() {
-	for {
-		TM29.Cls()
-		fmt.Println("Choose One")
-		fmt.Println("1. Eat Me")
-		fmt.Println("2. Drink Me")
-		fmt.Println("3. Wake Up")
-		res, err := TM29.StringPrompt("One or Two, What shall I do?")
-		if err != nil {
-			fmt.Println("Error reading input:", err)
-			continue
-		}
+    for {
+        TM29.Cls()
+        fmt.Println("Choose One")
+        fmt.Println("1. Eat Me")
+        fmt.Println("2. Drink Me")
+        fmt.Println("3. Wake Up")
+        res, err := TM29.StringPrompt("One or Two, What shall I do?")
+        if err != nil {
+            fmt.Println("Error reading input:", err)
+            continue
+        }
 
-		switch res {
-		case "1":
-			response, err := TM29.FetchFromServer("/eatme")
-			if err != nil {
-				fmt.Println("Error fetching data:", err)
-				continue
-			}
-			fmt.Println(response)
-			err = TM29.ListAndSelectFiles("./EatMe")
-			if err != nil {
-				fmt.Println("Error selecting file:", err)
-			}
-		case "2":
-			response, err := TM29.FetchFromServer("./drinkme")
-			if err != nil {
-				fmt.Println("Error fetching data:", err)
-				continue
-			}
-			fmt.Println(response)
-			err = TM29.ListAndSelectFiles("./DrinkMe")
-			if err != nil {
-				fmt.Println("Error selecting file:", err)
-			}
-		case "3":
+        switch res {
+        case "1":
+            response, err := TM29.FetchFromServer("/eatme")
+            if err != nil {
+                fmt.Println("Error fetching data:", err)
+                continue
+            }
+            fmt.Println(response)
+            selectedFile, err := TM29.ListAndSelectFiles("./EatMe")
+            if err != nil {
+                fmt.Println("Error selecting file:", err)
+                continue
+            }
+            fmt.Println("Selected file:", selectedFile)
+        case "2":
+            response, err := TM29.FetchFromServer("./drinkme")
+            if err != nil {
+                fmt.Println("Error fetching data:", err)
+                continue
+            }
+            fmt.Println(response)
+            selectedFile, err := TM29.ListAndSelectFiles("./DrinkMe")
+            if err != nil {
+                fmt.Println("Error selecting file:", err)
+                continue
+            }
+            fmt.Println("Selected file:", selectedFile)
+        case "3":
 			for {
 				TM29.Cls()
 				fmt.Println("Are You Sure?")
@@ -105,7 +109,7 @@ func listAndSelectFiles(s string) (string, error) {
 		fmt.Printf("%d. %s\n", i+1, file.Name())
 	}
 
-	selection, err := TM29.stringPrompt("Select a file by number:")
+	selection, err := TM29.StringPrompt("Select a file by number:")
 	if err != nil {
 		return "", err
 	}
