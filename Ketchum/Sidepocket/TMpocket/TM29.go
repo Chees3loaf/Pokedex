@@ -154,32 +154,45 @@ func ListAndSelectFiles(directory string) (string, error) {
 }
 
 
+// FetchFromServer makes an HTTP GET request to a specified endpoint on a predefined server.
+// It returns the response body as a string and any error encountered during the process.
 func FetchFromServer(endpoint string) (string, error) {
+    // Define the server address.
     serverAddress := "10.0.0.55:55555"
 
+    // Perform an HTTP GET request to the server using the provided endpoint.
     resp, err := http.Get(serverAddress + endpoint)
     if err != nil {
+        // Return a formatted error if the request fails.
         return "", fmt.Errorf("error making request to server: %v", err)
     }
+    // Ensure the response body is closed after the function exits.
     defer resp.Body.Close()
 
+    // Check if the server's response status is not 'OK'.
     if resp.StatusCode != http.StatusOK {
+        // Return a formatted error if the status is not 'OK'.
         return "", fmt.Errorf("server returned non-OK status: %s", resp.Status)
     }
 
-    // Using bufio.Reader to read the response body
+    // Use a buffered reader to read the response body.
     reader := bufio.NewReader(resp.Body)
     var response strings.Builder
+    // Read the response body line by line until EOF is reached.
     for {
         line, err := reader.ReadString('\n')
         if err != nil && err != io.EOF {
+            // Return a formatted error if there's an issue reading the response body.
             return "", fmt.Errorf("error reading response body: %v", err)
         }
         if err == io.EOF {
+            // Break the loop if EOF is reached.
             break
         }
+        // Append each line to the response string.
         response.WriteString(line)
     }
 
+    // Return the complete response body as a string.
     return response.String(), nil
 }

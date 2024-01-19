@@ -2,7 +2,6 @@ go 1.21.5
 
 use (
 	./Ketchum
-	./Ketchum/Backpack
 	./Ditto
 	./Ketchum/Sidepocket
 	./Ketchum/Sidepocket/Ballpocket
